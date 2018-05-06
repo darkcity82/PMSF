@@ -1698,6 +1698,7 @@ function loadWeatherCellData(cell) {
 function searchAjax(field) { // eslint-disable-line no-unused-vars
     var term = field.val()
     var type = field.data('type')
+    var center = map.getCenter()
     if (term !== '') {
         $.ajax({
             url: 'search',
@@ -1707,7 +1708,9 @@ function searchAjax(field) { // eslint-disable-line no-unused-vars
             cache: false,
             data: {
                 'action': type,
-                'term': term
+                'term': term,
+                'lat': center.lat(),
+                'lon': center.lng()
             },
             error: function error() {
                 // Display error toast
@@ -1721,10 +1724,15 @@ function searchAjax(field) { // eslint-disable-line no-unused-vars
                 sr.html('')
                 data.forEach(function (element) {
                     var html = '<li class="search-result ' + type + '" data-lat="' + element.lat + '" data-lon="' + element.lon + '"><div class="left-column" onClick="centerMapOnCoords(event);">'
-                    if (element.url !== '') {
+                    if (sr.hasClass('nest-results')) {
+                        html += '<span class="i-icon"><span class="pokemon-icon n' + element.pokemon_id + '" ></span></span>'
+                    } else if (element.url !== '') {
                         html += '<span style="background:url(' + element.url + ') no-repeat;" class="i-icon" ></span>'
                     }
                     html += '<div class="cont"><span class="name" >' + element.name + '</span>'
+                    if (sr.hasClass('nest-results')) {
+                        html += '<span class="distance">&nbsp;-&nbsp;' + element.distance + defaultUnit + '</span>'
+                    }
                     if(sr.hasClass('reward-results')){
                         html += '<span>&nbsp;-&nbsp;</span> <span class="reward" style="font-weight:bold">' + element.reward + '</span>'
                     }
@@ -1750,9 +1758,13 @@ function centerMapOnCoords(event) { // eslint-disable-line no-unused-vars
         point = point.parent().parent().parent()
     } else if (point.hasClass('name') || point.hasClass('reward')) {
         point = point.parent().parent().parent()
+    } else if (point.hasClass('pokemon-icon')) {
+        point = point.parent().parent().parent()
+    } else if (point.hasClass('distance')) {
+        point = point.parent().parent().parent()
     } else if (!point.hasClass('search-result')) {
         point = point.parent().parent()
-    }  else{
+    } else{
         point = point.parent().parent().parent()
     }
     var lat = point.data('lat')
@@ -2294,7 +2306,7 @@ function openSearchModal(event) { // eslint-disable-line no-unused-vars
         width: width,
         buttons: {},
         open: function (event, ui) {
-            jQuery('input[name="gym-search"], input[name="pokestop-search"], input[name="reward-search"]').bind('input', function () {
+            jQuery('input[name="gym-search"], input[name="pokestop-search"], input[name="reward-search"], input[name="nest-search"]').bind('input', function () {
                 searchAjax($(this))
             })
             $('.search-widget-popup #search-tabs').tabs()
