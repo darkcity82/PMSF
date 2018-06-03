@@ -1,6 +1,6 @@
 # PMSF---PokeMap-Standalone-Frontend
 
-This is the manual raid posting branch I put together a while back and only supports Hydro's Scanner.
+This is the manual raid posting branch I put together a while back and only supports RM SLoppy Scanner.
 
 > Current Version 1.0 - First release!
 
